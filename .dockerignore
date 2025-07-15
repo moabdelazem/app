@@ -1,0 +1,93 @@
+# Git and version control
+.git
+.gitignore
+.github
+
+# Documentation
+*.md
+!README.md
+docs/
+DOCKER_ENHANCEMENTS.md
+TEST_COVERAGE.md
+TESTING.md
+
+# Development files
+.env
+.env.local
+.env.example
+.vscode/
+.idea/
+
+# Build artifacts
+bin/
+build/
+dist/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Test files and coverage
+*_test.go
+*.test
+*.out
+coverage.html
+coverage.out
+test_coverage/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+*.swp
+*.swo
+*~
+
+# Dependencies (will be downloaded in container)
+vendor/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Docker files (avoid recursion)
+Dockerfile*
+docker-compose*.yml
+.dockerignore
+
+# CI/CD files
+.github/
+.gitlab-ci.yml
+.travis.yml
+Jenkinsfile
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Configuration files that shouldn't be in image
+config.local.yml
+secrets/
+certs/
+
+# Node modules (if any)
+node_modules/
+npm-debug.log*
+
+# Python files (if any)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Scripts that are development-only
+scripts/dev/
+scripts/local/
+
+# Makefile (not needed in container)
+Makefile

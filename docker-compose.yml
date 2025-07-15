@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        VERSION: "1.0.0"
+        BUILD_DATE: "2025-07-15T00:00:00Z"
+    container_name: guestbook_api_prod
+    restart: unless-stopped
+    ports:
+      - "4260:4260"
+    environment:
+      - PORT=4260
+      - DEBUG=false
+      - DB_HOST=postgres
+      - DB_USER=${DB_USER:-guestbook}
+      - DB_PASSWORD=${DB_PASSWORD:-secure_password}
+      - DB_NAME=${DB_NAME:-guestbook_prod}
+      - DB_PORT=5432
+      - DB_SSL_MODE=disable
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - guestbook_network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:4260/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 128M
+        reservations:
+          cpus: '0.1'
+          memory: 32M
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: guestbook_postgres_prod
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-guestbook_prod}
+      POSTGRES_USER: ${DB_USER:-guestbook}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secure_password}
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
+    volumes:
+      - postgres_prod_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - guestbook_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-guestbook} -d ${DB_NAME:-guestbook_prod}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+        reservations:
+          cpus: '0.1'
+          memory: 64M
+
+networks:
+  guestbook_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+volumes:
+  postgres_prod_data:
+    driver: local
