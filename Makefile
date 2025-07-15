@@ -38,6 +38,22 @@ clean: ## Clean build artifacts
 test: ## Run tests
 	go test -v ./...
 
+.PHONY: test-short
+test-short: ## Run tests without verbose output
+	go test ./...
+
+.PHONY: test-handlers
+test-handlers: ## Run handler tests only
+	go test -v ./internal/handlers
+
+.PHONY: test-server
+test-server: ## Run server tests only
+	go test -v ./internal/server
+
+.PHONY: test-watch
+test-watch: ## Run tests in watch mode (requires entr to be installed)
+	find . -name "*.go" | entr -c go test ./...
+
 .PHONY: test-coverage
 test-coverage: ## Run tests with coverage
 	go test -v -coverprofile=coverage.out ./...

@@ -41,12 +41,19 @@ func HealthHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type GuestBookHandler struct {
-	service *service.GuestBookService
+	service GuestBookServiceInterface
 }
 
 func NewGuestBookHandler(db *database.DB) *GuestBookHandler {
 	return &GuestBookHandler{
 		service: service.NewGuestBookService(repository.NewGuestBookRepository(db)),
+	}
+}
+
+// NewGuestBookHandlerWithService creates a new handler with a custom service (useful for testing)
+func NewGuestBookHandlerWithService(service GuestBookServiceInterface) *GuestBookHandler {
+	return &GuestBookHandler{
+		service: service,
 	}
 }
 
@@ -204,4 +211,12 @@ func APIInfoHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	RespondJSON(w, http.StatusOK, apiInfo)
+}
+
+// GuestBookServiceInterface defines the interface for guest book service operations
+type GuestBookServiceInterface interface {
+	InitializeDatabase(ctx context.Context) error
+	CreateMessage(ctx context.Context, msg *models.CreateGuestBookMessage) (*models.GuestBookMessage, error)
+	GetMessages(ctx context.Context, page, pageSize int) ([]models.GuestBookMessage, int, error)
+	GetMessageByID(ctx context.Context, idStr string) (*models.GuestBookMessage, error)
 }
