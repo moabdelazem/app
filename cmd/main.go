@@ -22,9 +22,8 @@ func main() {
 
 	// Create and configure server
 	srv := server.NewServer(cfg)
-	srv.RegisterRoutes()
 
-	// Start server
+	// Start server (this will now initialize database and register routes)
 	if err := srv.Start(); err != nil {
 		slog.Error("Error starting server", "error", err)
 		os.Exit(1)
